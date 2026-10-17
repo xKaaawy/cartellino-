@@ -1,0 +1,64 @@
+name: Crea l'app Android
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    working-directory: Cartellino-progetto3
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica il progetto
+        uses: actions/checkout@v4
+
+      - name: Prepara Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Prepara Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Prepara Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Installa le dipendenze
+        run: npm install --no-audit --no-fund
+
+      - name: Crea il progetto Android
+        run: |
+          npx cap add android
+          node scripts/android-setup.mjs
+          npx cap sync android
+
+      - name: Usa sempre la stessa firma
+        run: |
+          mkdir -p ~/.android
+          cp keystore/debug.keystore ~/.android/debug.keystore
+
+      - name: Compila l'APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+          cp app/build/outputs/apk/debug/app-debug.apk ../Cartellino.apk
+
+      - name: Pubblica l'APK da scaricare
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.${{ github.run_number }}
+          name: Cartellino 1.${{ github.run_number }}
+          body: Scarica Cartellino.apk dal telefono e aprilo per installare o aggiornare l'app.
+          files: Cartellino-progetto3/Cartellino.apk
+          make_latest: true
