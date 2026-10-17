@@ -19,7 +19,7 @@ html{-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#eef0f5; --surface:#ffffff; --ink:#171a2b; --muted:#5d6278; --line:#d8dbe6;
   --accent:#3b44c4; --accent-soft:#e3e5fb; --on-accent:#ffffff;
-  --ferie:#1f8a5b; --malattia:#c2561c; --permesso:#9a7400; --holiday:#c0283a; --ticket:#a8650a; --ticket-soft:#fbecd2;
+  --ferie:#1f8a5b; --malattia:#c2561c; --permesso:#9a7400; --assenza:#6b6f86; --holiday:#c0283a; --ticket:#a8650a; --ticket-soft:#fbecd2;
   --shade:rgba(15,18,35,.42);
   --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
   --f-body:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -28,12 +28,12 @@ html{-webkit-tap-highlight-color:transparent}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#12141d; --surface:#1b1e2a; --ink:#e9eaf2; --muted:#9aa0b8; --line:#2d3144;
   --accent:#8f97ff; --accent-soft:#272b4f; --on-accent:#10122a;
-  --ferie:#4fc28d; --malattia:#f08a52; --permesso:#e0b43a; --holiday:#ff6b7a; --ticket:#f2b14c; --ticket-soft:#3a2a12;
+  --ferie:#4fc28d; --malattia:#f08a52; --permesso:#e0b43a; --assenza:#8d92aa; --holiday:#ff6b7a; --ticket:#f2b14c; --ticket-soft:#3a2a12;
   --shade:rgba(0,0,0,.6); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#12141d; --surface:#1b1e2a; --ink:#e9eaf2; --muted:#9aa0b8; --line:#2d3144;
   --accent:#8f97ff; --accent-soft:#272b4f; --on-accent:#10122a;
-  --ferie:#4fc28d; --malattia:#f08a52; --permesso:#e0b43a; --holiday:#ff6b7a; --ticket:#f2b14c; --ticket-soft:#3a2a12;
+  --ferie:#4fc28d; --malattia:#f08a52; --permesso:#e0b43a; --assenza:#8d92aa; --holiday:#ff6b7a; --ticket:#f2b14c; --ticket-soft:#3a2a12;
   --shade:rgba(0,0,0,.6); color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -98,6 +98,12 @@ h1 span{color:var(--accent)}
 .day.t-lavoro .h{color:var(--accent)}
 .day.t-ferie .h{color:var(--ferie)} .day.t-malattia .h{color:var(--malattia)} .day.t-permesso .h{color:var(--permesso)}
 .day .tag{font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;align-self:flex-end;line-height:1}
+.day.t-assenza{background:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--assenza) 16%,transparent) 5px 7px),var(--surface)}
+.day.t-assenza .tag{color:var(--assenza)}
+#edType{grid-template-columns:repeat(5,minmax(0,1fr))}
+#edType button{font-size:12px;padding:9px 0}
+.sheet.is-abs .stepper,.sheet.is-abs #edChips,.sheet.is-abs .times{opacity:.35;pointer-events:none}
+.abs-note{font-size:13px;color:var(--muted);margin:0}
 .day.t-ferie .tag{color:var(--ferie)} .day.t-malattia .tag{color:var(--malattia)} .day.t-permesso .tag{color:var(--permesso)}
 .day .note-dot{position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;background:var(--muted)}
 .day .stamp{border:2px solid currentColor;border-radius:6px;padding:2px 3px 1px;transform:rotate(-8deg);box-shadow:inset 0 0 0 1px var(--surface),inset 0 0 0 2px currentColor;opacity:.92;margin:0 1px 1px 0}
@@ -115,7 +121,7 @@ h1 span{color:var(--accent)}
   border:2.5px solid currentColor;border-radius:8px;padding:5px 9px;box-shadow:inset 0 0 0 1.5px var(--surface),inset 0 0 0 3px currentColor,0 8px 22px rgba(0,0,0,.22);white-space:nowrap}
 .drag-ghost.empty{color:var(--muted);border-style:dashed;box-shadow:0 8px 22px rgba(0,0,0,.22)}
 .drag-ghost[data-n]:not([data-n=""])::after{content:attr(data-n);margin-left:6px;font-size:12px;color:var(--ink)}
-.drag-ghost.t-ferie{color:var(--ferie)}.drag-ghost.t-malattia{color:var(--malattia)}.drag-ghost.t-permesso{color:var(--permesso)}
+.drag-ghost.t-assenza{color:var(--assenza)}.drag-ghost.t-ferie{color:var(--ferie)}.drag-ghost.t-malattia{color:var(--malattia)}.drag-ghost.t-permesso{color:var(--permesso)}
 .day .tr{position:absolute;left:4px;bottom:4px;line-height:0}
 .day .tr svg{width:13px;height:13px;color:var(--muted)}
 .day .tr.mirko{line-height:1;font-family:var(--f-mono);font-size:8.5px;font-weight:600;letter-spacing:.02em;color:var(--ticket);background:var(--ticket-soft);border:1px dashed var(--ticket);border-radius:3px;padding:1px 2px}
@@ -438,8 +444,9 @@ textarea{width:100%;min-height:60px;resize:vertical;padding:10px;border-radius:1
     <div><h3 id="edTitle">—</h3><div class="sub" id="edSub"></div></div>
     <div class="song" id="edSong" hidden></div>
     <div class="seg" id="edType" role="group" aria-label="Tipo di giornata">
-      <button data-t="lavoro">Lavoro</button><button data-t="ferie">Ferie</button><button data-t="malattia">Malattia</button><button data-t="permesso">Permesso</button>
+      <button data-t="lavoro">Lavoro</button><button data-t="ferie">Ferie</button><button data-t="malattia">Malattia</button><button data-t="permesso">Permesso</button><button data-t="assenza">Assenza</button>
     </div>
+    <p class="abs-note" id="absNote" hidden>Assenza: la giornata resta segnata ma non conta tra le ore del mese e non viene pagata.</p>
     <div class="stepper">
       <button id="edMinus" aria-label="Togli 15 minuti">−</button>
       <div class="val" id="edVal">6 <small>h</small></div>
@@ -496,7 +503,10 @@ const holCache={};
 function holidays(y){if(holCache[y])return holCache[y];const H={"1-1":"Capodanno","1-6":"Epifania","4-25":"Festa della Liberazione","5-1":"Festa dei Lavoratori","6-2":"Festa della Repubblica","8-15":"Ferragosto","10-4":"San Francesco d'Assisi","11-1":"Ognissanti","12-8":"Immacolata","12-25":"Natale","12-26":"Santo Stefano"};const e=easter(y);H[(e.getMonth()+1)+"-"+e.getDate()]="Pasqua";const lm=new Date(e);lm.setDate(lm.getDate()+1);H[(lm.getMonth()+1)+"-"+lm.getDate()]="Lunedì dell'Angelo";return holCache[y]=H}
 const holiday=d=>holidays(d.getFullYear())[(d.getMonth()+1)+"-"+d.getDate()]||null;
 
-function monthTotals(y,m){const mo=state.months[mkey(y,m)]||{};let w=0,a=0;for(const k in mo){const e=mo[k];if(!e||!e.h)continue;if(e.t==="lavoro"||!e.t)w+=e.h;else a+=e.h}return{w,a,t:w+a}}
+const isAbs=e=>!!e&&e.t==="assenza";
+const dayDone=e=>!!e&&(!!e.h||e.t==="assenza");
+function absDays(y,m){return Object.values(state.months[mkey(y,m)]||{}).filter(isAbs).length}
+function monthTotals(y,m){const mo=state.months[mkey(y,m)]||{};let w=0,a=0;for(const k in mo){const e=mo[k];if(!e||!e.h||isAbs(e))continue;if(e.t==="lavoro"||!e.t)w+=e.h;else a+=e.h}return{w,a,t:w+a}}
 /* stipendio: co.co.co. pagato a ore; solo le ore di lavoro sono retribuite */
 function netFor(h){const p=state.settings.pay;if(!h)return{g:0,n:0};const g=h*p.rate,inps=g*p.inps/100,imp=g-inps-p.inail,tax=Math.max(0,imp*p.irpef/100-p.detr);return{g,n:Math.max(0,g-inps-p.inail-tax)}}
 const marginal=()=>{const p=state.settings.pay;return p.rate*(1-p.inps/100)*(1-p.irpef/100)};
@@ -535,7 +545,7 @@ const payday=(y,m)=>new Date(y,m+1,10);
 function workedHours(y,m){return monthTotals(y,m).w}
 function projectedHours(y,m){const w=workedHours(y,m),end=new Date(y,m+1,0),t0=new Date();t0.setHours(0,0,0,0);if(end<t0)return w;
   let rest=0;const d=new Date(Math.max(t0,new Date(y,m,1)));
-  while(d<=end){if(isWorkday(d)&&!holiday(d)&&!(getEntry(d)||{}).h)rest+=state.settings.daily;d.setDate(d.getDate()+1)}return w+rest}
+  while(d<=end){if(isWorkday(d)&&!holiday(d)&&!dayDone(getEntry(d)))rest+=state.settings.daily;d.setDate(d.getDate()+1)}return w+rest}
 function monthsWithData(){return Object.keys(state.months).filter(k=>Object.values(state.months[k]||{}).some(e=>e&&e.h)).map(k=>{const [,y,m]=k.split("-");return{y:+y,m:+m-1}}).sort((a,b)=>a.y-b.y||a.m-b.m)}
 function walletState(){const b=state.settings.balance,now=new Date();
   const nt=new Date(now);const nextM=nt.getDate()<10?new Date(nt.getFullYear(),nt.getMonth()-1,1):new Date(nt.getFullYear(),nt.getMonth(),1);
@@ -619,18 +629,34 @@ function songEl(el,song,label,sub){el.innerHTML="";if(!song||mset().src==="none"
   el.append(art,mid,c);el.hidden=false}
 /* Last.fm */
 function lfmImg(arr){const ok=(arr||[]).filter(i=>i&&i["#text"]&&!/2a96cbd8b46e442fc41c2b86b821562f/.test(i["#text"]));const x=ok.find(i=>i.size==="extralarge")||ok.find(i=>i.size==="large")||ok[ok.length-1];return x?x["#text"]:""}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function lfmPage(user,key,from,to,page){let last;
+  for(let a=0;a<4;a++){
+    try{const r=await fetch("https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=200&user="+encodeURIComponent(user)+"&api_key="+encodeURIComponent(key)+"&from="+from+"&to="+to+"&page="+page,{headers:{"Accept":"application/json"}});
+      let j=null;try{j=typeof r.json==="function"?await r.json():r}catch(e){}
+      if(j&&j.error){const c=+j.error;
+        if(c===6)throw Object.assign(new Error("Utente Last.fm non trovato: controlla il nome"),{fatal:true});
+        if(c===10||c===26)throw Object.assign(new Error("API key Last.fm non valida"),{fatal:true});
+        if(c===17)throw Object.assign(new Error("Il profilo Last.fm è privato: rendi pubblici gli ascolti"),{fatal:true});
+        last=new Error("Last.fm è occupato (errore "+c+")")}
+      else if(r.status&&r.status>=400)last=new Error("Last.fm non risponde (http "+r.status+")");
+      else if(j&&j.recenttracks)return j.recenttracks;
+      else last=new Error("Risposta strana da Last.fm")}
+    catch(e){if(e.fatal)throw e;last=e}
+    await sleep(800*Math.pow(2,a)+Math.random()*400)}
+  throw last||new Error("Last.fm non risponde")}
+function lfmTracks(rt){let tr=(rt&&rt.track)||[];if(!Array.isArray(tr))tr=[tr];return tr.filter(x=>x&&x.date)}
+function lfmCommit(tracks){let max=0;for(const x of tracks){const ts=+x.date.uts,artist=(x.artist&&(x.artist["#text"]||x.artist.name))||"";
+  addPlay(ts*1000,(artist+"|"+x.name).toLowerCase(),x.name,artist,lfmImg(x.image));if(ts>max)max=ts}return max}
 async function lfmSync(){const ms=mset(),key=(ms.lfmKey||CFG.lastfmApiKey||"").trim(),user=(ms.lfmUser||"").trim();if(!key||!user)return;
   const nowS=Math.floor(Date.now()/1000),start=Math.floor(new Date(new Date().getFullYear(),new Date().getMonth()-1,1).getTime()/1000);
   if(music.lfm.user!==user){music.days={};music.lfm={user,to:start-1}}
-  const from=(music.lfm.to||start-1)+1;let page=1,pages=1,maxTs=from-1;
-  while(page<=pages&&page<=15){
-    const j=await getJSON("https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&format=json&limit=200&user="+encodeURIComponent(user)+"&api_key="+encodeURIComponent(key)+"&from="+from+"&to="+nowS+"&page="+page);
-    if(j&&j.error)throw new Error(j.error===6?"Utente Last.fm non trovato":j.error===10||j.error===26?"API key Last.fm non valida":(j.message||"Errore Last.fm"));
-    const rt=(j&&j.recenttracks)||{};pages=+((rt["@attr"]||{}).totalPages)||1;let tr=rt.track||[];if(!Array.isArray(tr))tr=[tr];
-    for(const x of tr){if(!x||!x.date)continue;const ts=+x.date.uts,artist=(x.artist&&(x.artist["#text"]||x.artist.name))||"";
-      addPlay(ts*1000,(artist+"|"+x.name).toLowerCase(),x.name,artist,lfmImg(x.image));if(ts>maxTs)maxTs=ts}
-    page++}
-  music.lfm.to=Math.max(maxTs,from-1);music.lfm.user=user;music.lfm.ok=Date.now();saveMusic()}
+  const from=(music.lfm.to||start-1)+1;if(from>nowS)return;
+  /* le pagine vanno dalla più recente alla più vecchia: si salvano dalla più vecchia, così un errore a metà non fa contare due volte gli stessi ascolti */
+  const first=await lfmPage(user,key,from,nowS,1);const pages=Math.min(+((first["@attr"]||{}).totalPages)||1,15);
+  for(let p=pages;p>=2;p--){const rt=await lfmPage(user,key,from,nowS,p);const mx=lfmCommit(lfmTracks(rt));if(mx){music.lfm.to=mx;saveMusic()}}
+  const mx=lfmCommit(lfmTracks(first));
+  music.lfm.to=Math.max(mx,music.lfm.to||0,pages>=15?0:nowS-60);music.lfm.user=user;music.lfm.ok=Date.now();music.lfm.err="";saveMusic()}
 /* Spotify (PKCE) */
 const b64url=buf=>btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 const spClientId=()=>(mset().spClient||CFG.spotifyClientId||"").trim();
@@ -665,7 +691,9 @@ async function spSync(){if(!music.sp)return;let tok=await spAccess();
 let musBusy=false;
 async function musicSync(loud){const src=mset().src;if(musBusy||src==="none")return;musBusy=true;
   try{if(src==="lastfm")await lfmSync();else if(src==="spotify")await spSync();safeRender();syncMusicStatus()}
-  catch(e){syncMusicStatus(e&&e.message);if(loud)toast(e&&e.message&&e.message.length<70?e.message:"Musica non aggiornata: riprova più tardi")}
+  catch(e){const msg=e&&e.message||"";const soft=/http 5|occupato|non risponde|Failed to fetch|network/i.test(msg);
+    syncMusicStatus(soft?(loud?"Last.fm o Spotify non rispondono in questo momento. Riprova tra qualche minuto.":null):msg);
+    if(loud)toast(soft?"Il servizio non risponde, riprova tra poco":(msg.length<80?msg:"Musica non aggiornata: riprova più tardi"))}
   finally{musBusy=false}}
 function syncMusicStatus(err){const sp=$("spStatus"),lf=$("lfmStatus");
   const when=t=>t?new Date(t).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}):"";
@@ -689,7 +717,7 @@ function scheduleReminders(){if(!PL.LocalNotifications)return;clearTimeout(remT)
     if(pays.length)await PL.LocalNotifications.schedule({notifications:pays})}
   const r=state.settings.remind;if(!r||!r.on)return;
   const [hh,mm]=String(r.time||"20:00").split(":").map(Number),now=new Date(),t0=new Date();t0.setHours(0,0,0,0);const list=[];
-  for(let i=0;i<21;i++){const d=new Date(t0);d.setDate(d.getDate()+i);if(!isWorkday(d)||holiday(d)||(getEntry(d)||{}).h)continue;
+  for(let i=0;i<21;i++){const d=new Date(t0);d.setDate(d.getDate()+i);if(!isWorkday(d)||holiday(d)||dayDone(getEntry(d)))continue;
     const at=new Date(d);at.setHours(hh||0,mm||0,0,0);if(at<=now)continue;
     list.push({id:1000+i,title:"Hai timbrato oggi?",body:"Segna le ore di "+GIORNI[d.getDay()]+" "+d.getDate()+" nel Cartellino.",schedule:{at,allowWhileIdle:true}})}
   if(list.length)await PL.LocalNotifications.schedule({notifications:list})}catch(e){}},700)}
@@ -736,12 +764,12 @@ function renderSummary(){
   else{sal.textContent="mancano "+fmt(-diff)+" h";sal.className="saldo neg"}
   const max=Math.max(goal,t)||1,bars=$("sumBar").children;
   bars[0].style.width=(w/max*100)+"%";bars[1].style.width=(a/max*100)+"%";
-  $("legW").textContent="Lavorate "+fmt(w)+" h";$("legA").textContent="Ferie / malattia / permessi "+fmt(a)+" h";
+  $("legW").textContent="Lavorate "+fmt(w)+" h";{const na=absDays(viewY,viewM);$("legA").textContent="Ferie / malattia / permessi "+fmt(a)+" h"+(na?" · "+na+(na===1?" assenza":" assenze"):"")}
   const np=netFor(w);$("payNet").textContent="≈ "+eur(np.n);$("payGross").textContent="lordo "+eur(np.g)+" · "+fmt(w)+" h pagate";
   const monthEnd=new Date(viewY,viewM+1,0);
   if(monthEnd<today){$("payProjLabel").textContent="Mese chiuso";$("payProj").textContent=eur(np.n);$("payProjSub").textContent="ore definitive"}
   else{const from=new Date(Math.max(today,new Date(viewY,viewM,1)));if(viewY===today.getFullYear()&&viewM===today.getMonth())from.setDate(from.getDate()+((getEntry(today)||{}).h?1:0));
-    let rest=0;const d=new Date(from);while(d<=monthEnd){if(isWorkday(d)&&!holiday(d)&&!(getEntry(d)||{}).h)rest+=state.settings.daily;d.setDate(d.getDate()+1)}
+    let rest=0;const d=new Date(from);while(d<=monthEnd){if(isWorkday(d)&&!holiday(d)&&!dayDone(getEntry(d)))rest+=state.settings.daily;d.setDate(d.getDate()+1)}
     const ph=w+rest,pp=netFor(ph);$("payProjLabel").textContent="Se completi il mese";$("payProj").textContent="≈ "+eur(pp.n);
     $("payProjSub").textContent=rest?"con altre "+fmt(rest)+" h → "+fmt(ph)+" h":"niente da aggiungere"}
 
@@ -749,7 +777,8 @@ function renderSummary(){
   $("dayLabel").textContent=isToday?"Oggi":GIORNI[selDate.getDay()].slice(0,3)+" "+selDate.getDate()+" "+MESI[selDate.getMonth()].slice(0,3);
   const e=getEntry(selDate);
   $("sumDay").innerHTML="";
-  if(e&&e.h){$("sumDay").append(fmt(e.h)+" ");const s=document.createElement("small");s.textContent=e.t&&e.t!=="lavoro"?"h · "+e.t:"h";$("sumDay").append(s)}
+  if(isAbs(e)){$("sumDay").textContent="assenza"}
+  else if(e&&e.h){$("sumDay").append(fmt(e.h)+" ");const s=document.createElement("small");s.textContent=e.t&&e.t!=="lavoro"?"h · "+e.t:"h";$("sumDay").append(s)}
   else $("sumDay").textContent="—";
   $("trLabel").textContent=(isToday?"Oggi":GIORNI[selDate.getDay()]+" "+selDate.getDate())+" vado con";
   const ctr=(e&&e.tr)||"";[...$("trToday").children].forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tr===ctr)));
@@ -775,7 +804,7 @@ function renderCal(){
     const nEl=document.createElement("span");nEl.className="n";nEl.textContent=d;b.append(nEl);
     let label=GIORNI[dt.getDay()]+" "+d+" "+MESI[viewM]+(hol?", "+hol:"");
     if(e&&e.tr){const tb=document.createElement("span");tb.className="tr "+e.tr;if(e.tr==="bus")tb.innerHTML=BUS;else tb.textContent="MT";b.append(tb);label+=", "+(e.tr==="bus"?"in autobus":"con Mirko (Micocci Ticket)")}
-    if(e&&(e.h||e.n)){
+    if(e&&(e.h||e.n||isAbs(e))){
       const t=e.t||"lavoro";b.classList.add("t-"+t);
       if(t!=="lavoro"){const tg=document.createElement("span");tg.className="tag";tg.textContent=t.slice(0,3);b.append(tg)}
       if(e.h){const h=document.createElement("span");h.className="h stamp";h.textContent=fmt(e.h);b.append(h);label+=", "+fmt(e.h)+" ore "+t;
@@ -944,10 +973,10 @@ const cellAt=(x,y)=>{const el=document.elementFromPoint(x,y);const c=el&&el.clos
 const dateOfCell=c=>{const [y,m,d]=c.dataset.d.split("-").map(Number);return new Date(y,m,d)};
 const shortDay=d=>GIORNI[d.getDay()].slice(0,3)+" "+d.getDate()+" "+MESI[d.getMonth()].slice(0,3);
 function startDrag(cell,x,y){const src=dateOfCell(cell),e=getEntry(src);
-  let entry=null;if(e&&(e.h||e.tr)){entry={t:e.t||"lavoro"};if(e.h)entry.h=e.h;if(e.tr)entry.tr=e.tr;if(e.in&&e.out){entry.in=e.in;entry.out=e.out;if(e.br)entry.br=e.br}}
+  let entry=null;if(e&&(e.h||e.tr||isAbs(e))){entry={t:e.t||"lavoro"};if(e.h)entry.h=e.h;if(e.tr)entry.tr=e.tr;if(e.in&&e.out){entry.in=e.in;entry.out=e.out;if(e.br)entry.br=e.br}}
   drag={src,entry,targets:new Map()};cell.classList.add("drag-src");
   ghost=document.createElement("div");ghost.className="drag-ghost "+(entry?"t-"+entry.t:"empty");
-  ghost.textContent=entry?[entry.h?fmt(entry.h)+" h"+(entry.t!=="lavoro"?" · "+entry.t:""):"",entry.tr?TRN[entry.tr]:""].filter(Boolean).join(" · "):"vuoto";document.body.append(ghost);
+  ghost.textContent=entry?[isAbs(entry)?"assenza":entry.h?fmt(entry.h)+" h"+(entry.t!=="lavoro"?" · "+entry.t:""):"",entry.tr?TRN[entry.tr]:""].filter(Boolean).join(" · "):"vuoto";document.body.append(ghost);
   buzz("light");
   moveDrag(x,y);return true}
 function moveDrag(x,y){if(!drag)return;ghost.style.transform="translate("+(x-ghost.offsetWidth/2)+"px,"+(y-ghost.offsetHeight-26)+"px)";
@@ -1012,7 +1041,7 @@ function setTransport(d,tr){const k=mkey(d.getFullYear(),d.getMonth()),mo=state.
   if(tr==="mirko")toast("Micocci Ticket timbrato: si torna a casa presto!");else if(tr==="bus")toast("Autobus segnato")}
 function fillTargets(){const n=new Date(viewY,viewM+1,0).getDate(),out=[];const isCur=viewY===today.getFullYear()&&viewM===today.getMonth();
   const last=isCur?today.getDate():n;
-  for(let d=1;d<=last;d++){const dt=new Date(viewY,viewM,d);if(!isWorkday(dt)||holiday(dt))continue;const x=getEntry(dt);if(x&&x.h)continue;out.push(dt)}return{out,isCur}}
+  for(let d=1;d<=last;d++){const dt=new Date(viewY,viewM,d);if(!isWorkday(dt)||holiday(dt))continue;const x=getEntry(dt);if(dayDone(x))continue;out.push(dt)}return{out,isCur}}
 let confirmMode="fill";
 $("btnEmpty").onclick=()=>{confirmMode="empty";const mo=state.months[mkey(viewY,viewM)]||{};const n=Object.keys(mo).length;$("fillConfirm").hidden=false;
   if(!n){$("fillText").textContent="Non c'è niente da svuotare in "+MESI[viewM]+" "+viewY+".";$("fillYes").hidden=true;return}
@@ -1042,7 +1071,7 @@ function openEditor(d){
   $("edChips").innerHTML="";ch.forEach(v=>{const b=document.createElement("button");b.textContent=fmt(v)+" h";b.onclick=()=>{ed.h=v;clearTimes();paintEd()};$("edChips").append(b)});
   paintEd();$("shade").hidden=false;$("sheet").hidden=false;render();$("edSave").focus();
 }
-function paintEd(){$("edVal").innerHTML="";$("edVal").append(fmt(ed.h)+" ");const s=document.createElement("small");s.textContent="h";$("edVal").append(s);
+function paintEd(){$("sheet").classList.toggle("is-abs",ed.t==="assenza");$("absNote").hidden=ed.t!=="assenza";$("edVal").innerHTML="";$("edVal").append(fmt(ed.h)+" ");const s=document.createElement("small");s.textContent="h";$("edVal").append(s);
   [...$("edType").children].forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.t===ed.t)));
   [...$("edTr").children].forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tr===ed.tr)))}
 $("edTr").addEventListener("click",ev=>{const b=ev.target.closest("button");if(!b)return;ed.tr=b.dataset.tr;paintEd()});
@@ -1063,7 +1092,8 @@ $("edSave").onclick=()=>{const n=$("edNote").value.trim(),entry={h:ed.h,t:ed.t};
   if(n)entry.n=n;if(ed.tr)entry.tr=ed.tr;
   const before=extraOf(ed.d,getEntry(ed.d)),wasMirko=(getEntry(ed.d)||{}).tr==="mirko";
   if(!ed.h)delete entry.h;
-  setEntry(ed.d,(ed.h||n||ed.tr)?entry:null);if(ed.tr==="mirko"&&!wasMirko)setTimeout(()=>toast("Micocci Ticket timbrato: si torna a casa presto!"),ed.h?600:0);closeEditor();if(ed.h)stamp([ed.d]);render();
+  const abs=ed.t==="assenza";if(abs){delete entry.h;delete entry.in;delete entry.out;delete entry.br}
+  setEntry(ed.d,(abs||ed.h||n||ed.tr)?entry:null);if(ed.tr==="mirko"&&!wasMirko)setTimeout(()=>toast("Micocci Ticket timbrato: si torna a casa presto!"),ed.h?600:0);closeEditor();if(ed.h&&!abs)stamp([ed.d]);render();
   const dx=extraOf(ed.d,getEntry(ed.d))-before;if(dx>0)toast("+"+eur(dx*marginal())+" nel salvadanaio giochi")};
 
 /* ---- impostazioni ---- */
