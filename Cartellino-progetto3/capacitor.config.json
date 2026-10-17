@@ -1,0 +1,18 @@
+{
+  "appId": "it.cartellino.ore",
+  "appName": "Cartellino",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#3b44c4",
+    "adjustMarginsForEdgeToEdge": "auto"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_cartellino",
+      "iconColor": "#3b44c4"
+    }
+  }
+}
